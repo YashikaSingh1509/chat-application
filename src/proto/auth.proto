@@ -1,0 +1,112 @@
+syntax = "proto3";
+
+package clearlink.auth;
+
+service AuthService {
+    rpc verifyToken(authToken) returns (userData) {}
+    rpc logout(UserTokenData) returns (StatusResponse) {}
+    rpc generateUserToken(UserTokenData) returns (userToken){}
+    rpc createResetPasswordToken(tokenData) returns (resetToken) {}
+    rpc getLastLogin(LastLoginRequest) returns (LastLoginResponse) {}
+    rpc getPreSignedUrl(PreSignedUrl) returns (PreSignedUrlResponse) {}
+    rpc getPreSignedUrls(PreSignedUrlsRequest) returns (PreSignedUrlsResponse) {}
+    rpc upload(Upload) returns (UploadResponse) {}
+    rpc deleteMedia(DeleteMedia) returns (PreSignedUrlResponse) {}
+}
+
+message UserTokenData {
+  string userId = 1;
+  string device_type = 2;       // Optional in proto3 is implied if not required.
+  string device_id = 3;        // Proto3 doesn't use `optional` explicitly unless needed.
+  string device_token = 4;    
+  string type = 5;
+  string user_type = 6;
+}
+
+message authToken {
+    string token = 1;
+    map<string, string> original_request = 2;
+}
+
+
+message DeleteMedia {
+    string key = 1;
+}
+
+message userToken {
+    string access_token = 1;
+    string refresh_token = 2;
+}
+
+message userData {
+    string user_id = 1;
+    string aud = 2;
+    string sub = 3;
+    string device_id = 4;
+    string type = 5;
+    uint32 iat = 6;
+    string prm = 7;
+    uint32 exp = 8;
+    string iss = 9;
+    bool is_valid = 10;
+    optional string email = 11;
+    optional string full_name = 12;
+    optional string phone_no = 13;
+    string device_type = 14;
+    string user_type = 15;
+}
+
+message tokenData {
+    string user_id = 1;
+    string device_type = 2;
+    string device_id = 3;
+    string device_token = 4;    
+    string type = 5;
+    string user_type = 6;
+    string sub = 7;
+    optional string email = 8;
+}
+
+message resetToken {
+    string reset_token =1;
+}
+
+message StatusResponse {
+    string message = 1;
+}
+
+message LastLoginRequest {
+    string userId = 1;
+}
+
+message LastLoginResponse {
+    int64 lastLogin = 1;
+}
+
+message PreSignedUrl {
+    string uploadType = 1;
+    string filename = 2;
+}
+
+message PreSignedUrlResponse {
+    string presignedUrl = 1;
+    string key = 2;
+}
+
+message Upload {
+    bytes content = 1;
+    string key = 2;
+    string contentType = 3;
+}
+
+message UploadResponse {
+    string fileUrl = 1;
+}
+
+message PreSignedUrlsRequest {
+    repeated PreSignedUrl items = 1;
+}
+
+message PreSignedUrlsResponse {
+    repeated PreSignedUrlResponse presignedUrls = 1;
+}

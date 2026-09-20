@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package clearlink.user;
+
+service UserService {
+    rpc verifyToken(authToken) returns (userData) {}
+    rpc getServices(Empty) returns (servicesData) {}
+}
+
+message Empty {}
+
+message authToken {
+    string token = 1;
+    map<string, string> original_request = 2;
+}
+
+message userData {
+    string data = 1;
+}
+
+message Service {
+    string id = 1;
+    string name = 2;
+    string label = 3;
+    string url = 4;
+}
+
+message servicesData {
+    repeated Service data = 1;
+}

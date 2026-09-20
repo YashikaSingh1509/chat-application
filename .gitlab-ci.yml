@@ -1,0 +1,53 @@
+stages:
+  - build
+  - deploy
+
+variables:
+  DOCKER_REGISTRY_DEV: "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$AWS_ECR_REPOSITORY:admin_api_dev_$CI_COMMIT_SHORT_SHA"
+  DOCKER_REGISTRY_QA: "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$AWS_ECR_REPOSITORY:admin_api_qa_$CI_COMMIT_SHORT_SHA"
+
+build:
+  image: docker:28.5.2-alpine3.22
+  stage: build
+  only:
+    - dev
+    - qa
+  services:
+    - docker:28.5.2-dind-alpine3.22
+  before_script:
+    - apk update && apk add --no-cache aws-cli
+    - docker version
+  script:
+    - unset AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_SESSION_TOKEN AWS_PROFILE   
+    - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+
+    - if [ "$CI_COMMIT_BRANCH" == "dev" ] ; then docker build -t $DOCKER_REGISTRY_DEV --build-arg node_env=dev --build-arg aws_secrets=clearlink-dev-secrets --build-arg aws_default_region=us-east-1 . ; fi
+    - if [ "$CI_COMMIT_BRANCH" == "dev" ] ; then docker push $DOCKER_REGISTRY_DEV ; fi
+
+    - if [ "$CI_COMMIT_BRANCH" == "qa" ] ; then docker build -t $DOCKER_REGISTRY_QA --build-arg node_env=qa --build-arg aws_secrets=clearlink-qa-secrets --build-arg aws_default_region=us-east-1 . ; fi
+    - if [ "$CI_COMMIT_BRANCH" == "qa" ] ; then docker push $DOCKER_REGISTRY_QA ; fi    
+
+deploy:
+  stage: deploy
+  only:
+    - dev
+    - qa
+  image: registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest
+  artifacts:
+    exclude:
+      - '*'
+  script:
+    - unset AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_SESSION_TOKEN AWS_PROFILE
+    - export TOKEN=$(aws ecr get-login-password --region $AWS_REGION)
+    - curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.23.6/bin/linux/amd64/kubectl
+    - chmod +x ./kubectl
+    - mv kubectl /usr/bin/
+    - kubectl version --short --client
+    - aws configure set region us-east-1
+    - aws eks update-kubeconfig --region $AWS_REGION --name $K8_DEV_CLUSTER
+
+    - if [ "$CI_COMMIT_BRANCH" == "dev" ] ; then kubectl apply -f .k8s/dev/service.yaml ; fi
+    - if [ "$CI_COMMIT_BRANCH" == "dev" ] ; then sh .k8s/dev/deploy.sh ; fi
+
+    - if [ "$CI_COMMIT_BRANCH" == "qa" ] ; then kubectl apply -f .k8s/qa/service.yaml ; fi
+    - if [ "$CI_COMMIT_BRANCH" == "qa" ] ; then sh .k8s/qa/deploy.sh ; fi

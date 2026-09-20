@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+package clearlink.analytics;
+
+service AnalyticsService {
+  rpc RecordEvent(RecordEventRequest) returns (RecordEventResponse);
+  rpc GetSports(GetSportsRequest) returns (GetSportsResponse);
+  rpc GetLeagues(GetLeaguesRequest) returns (GetLeaguesResponse);
+  rpc GetTeams(GetTeamsRequest) returns (GetTeamsResponse);
+}
+
+message RecordEventRequest {
+  string event_name = 1;
+  string actor_id = 2;
+  map<string, string> properties = 3;
+}
+
+message RecordEventResponse {
+  bool success = 1;
+  string event_id = 2;
+  string message = 3;
+}
+
+message GetSportsRequest {}
+
+message GetSportsResponse {
+  repeated string sports = 1;
+}
+
+message GetLeaguesRequest {
+  string sport = 1;
+}
+
+message LeagueInfo {
+  string id = 1;
+  string name = 2;
+  string alternate = 3;
+  string country = 4;
+}
+
+message GetLeaguesResponse {
+  repeated LeagueInfo leagues = 1;
+}
+
+message GetTeamsRequest {
+  string league_id = 1;
+}
+
+message TeamInfo {
+  string id = 1;
+  string name = 2;
+  string short_name = 3;
+}
+
+message GetTeamsResponse {
+  repeated TeamInfo teams = 1;
+}
+

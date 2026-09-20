@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+package clearlink.notification;
+
+service NotificationService {
+  rpc SendEmail(SendEmailRequest) returns (SendEmailResponse);
+  rpc GetEmailStatus(GetEmailStatusRequest) returns (GetEmailStatusResponse);
+  rpc SendSms(SendSmsRequest) returns (SendSmsResponse);
+  rpc SendBulkNotification(SendBulkNotificationRequest) returns (SendBulkNotificationResponse);
+}
+
+message SendEmailRequest {
+  string recipient_email = 1;
+  string template_type = 2;
+  map<string, string> template_data = 3;
+  string createdBy = 4;
+}
+
+message SendEmailResponse {
+  bool success = 1;
+  string message = 2;
+  string email_log_id = 3;
+}
+
+message GetEmailStatusRequest {
+  string email_log_id = 1;
+}
+
+message GetEmailStatusResponse {
+  string status = 1;
+  string error_message = 2;
+  string sent_at = 3;
+}
+
+message SendSmsRequest {
+  string recipient_phone = 1;
+  string message = 2;
+}
+
+message SendSmsResponse {
+  bool success = 1;
+  string message = 2;
+  string success_id = 3;
+}
+
+message SendBulkNotificationRequest {
+  repeated string user_ids = 1;
+  string user_type = 2;
+  string title = 3;
+  string body = 4;
+  map<string, string> data = 5;
+  string createdBy = 6;
+  repeated string type = 7;
+}
+
+message SendBulkNotificationResponse {
+  bool success = 1;
+  string message = 2;
+  string push_log_id = 3;
+  int32 success_count = 4;
+  int32 failure_count = 5;
+  repeated string failed_user_ids = 6;
+}

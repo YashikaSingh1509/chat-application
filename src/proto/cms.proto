@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+import "google/protobuf/wrappers.proto";
+package clearlink.cms;
+
+service CMSService {
+    rpc tierList(tierList) returns (tierListResponse) {}
+}
+
+message success {
+    string message = 1;
+    int32 code = 2;
+}
+
+message tierList {
+  string sort = 1;
+  string sortOrder = 2;
+  string select = 3;
+}
+
+message tierListResponse {
+  repeated tierListItem tiers = 1;
+}
+
+message tierListItem {
+  string id = 1;
+  string title = 2;
+  uint32 minFrequenceRange = 3;
+  uint32 maxFrequenceRange = 4;
+  string startDate = 5;
+  string endDate = 6;
+  uint32 minlifetimeSpend = 7;
+  uint32 maxlifetimeSpend = 8;
+  string colorScheme = 9;
+  string createdAt = 10;
+  string updatedAt = 11;
+}

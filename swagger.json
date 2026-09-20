@@ -1,0 +1,727 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/admin/api/v1": {
+      "get": {
+        "operationId": "AppController_getHello",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "App"
+        ]
+      }
+    },
+    "/admin/api/v1/auth/register": {
+      "post": {
+        "operationId": "AuthController_register",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User registered successfully with access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                    "user": {
+                      "_id": "66fa89c0f91a2b0012345678",
+                      "name": "John Doe",
+                      "email": "john.doe@example.com",
+                      "profileImage": null,
+                      "isOnline": false,
+                      "createdAt": "2026-09-19T18:00:00.000Z",
+                      "updatedAt": "2026-09-19T18:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed on input payload"
+          },
+          "409": {
+            "description": "A user with this email already exists"
+          }
+        },
+        "summary": "Register a new user account",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/admin/api/v1/auth/login": {
+      "post": {
+        "operationId": "AuthController_login",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User authenticated successfully with access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                    "user": {
+                      "_id": "66fa89c0f91a2b0012345678",
+                      "name": "John Doe",
+                      "email": "john.doe@example.com",
+                      "profileImage": null,
+                      "isOnline": false,
+                      "createdAt": "2026-09-19T18:00:00.000Z",
+                      "updatedAt": "2026-09-19T18:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed on input payload"
+          },
+          "401": {
+            "description": "Invalid email or password"
+          }
+        },
+        "summary": "Authenticate user with email and password",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/admin/api/v1/users": {
+      "post": {
+        "operationId": "UsersController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User successfully created (password excluded)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "_id": "66fa89c0f91a2b0012345678",
+                    "name": "John Doe",
+                    "email": "john.doe@example.com",
+                    "profileImage": "https://example.com/avatar.jpg",
+                    "isOnline": false,
+                    "createdAt": "2026-09-19T17:15:00.000Z",
+                    "updatedAt": "2026-09-19T17:15:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed on input payload"
+          },
+          "409": {
+            "description": "User with this email already exists"
+          }
+        },
+        "summary": "Register / Create a new user",
+        "tags": [
+          "Users"
+        ]
+      },
+      "get": {
+        "operationId": "UsersController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "List of all registered users (passwords excluded)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "example": {
+                      "_id": "66fa89c0f91a2b0012345678",
+                      "name": "John Doe",
+                      "email": "john.doe@example.com",
+                      "profileImage": null,
+                      "isOnline": false,
+                      "createdAt": "2026-09-19T17:15:00.000Z",
+                      "updatedAt": "2026-09-19T17:15:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Retrieve all users",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/admin/api/v1/users/me": {
+      "get": {
+        "operationId": "UsersController_getMe",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Authenticated user profile (password excluded)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "_id": "66fa89c0f91a2b0012345678",
+                    "name": "John Doe",
+                    "email": "john.doe@example.com",
+                    "profileImage": null,
+                    "isOnline": false,
+                    "createdAt": "2026-09-19T18:00:00.000Z",
+                    "updatedAt": "2026-09-19T18:00:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, expired, or invalid Bearer token"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get current authenticated user profile",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/admin/api/v1/users/{id}": {
+      "get": {
+        "operationId": "UsersController_findById",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "MongoDB ObjectId string",
+            "schema": {
+              "example": "66fa89c0f91a2b0012345678",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User found (password excluded)"
+          },
+          "400": {
+            "description": "Invalid user ID format"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        },
+        "summary": "Retrieve a user by ID",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/admin/api/v1/rooms": {
+      "post": {
+        "operationId": "RoomsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRoomDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Room created successfully with host as first participant",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "_id": "66fa89c0f91a2b0012349999",
+                    "roomName": "Tech Talk & Architecture Sync",
+                    "hostId": {
+                      "_id": "66fa89c0f91a2b0012345678",
+                      "name": "Jane Doe",
+                      "email": "jane.doe@example.com",
+                      "profileImage": null
+                    },
+                    "status": "ACTIVE",
+                    "participantCount": 1,
+                    "createdAt": "2026-09-19T18:15:00.000Z",
+                    "updatedAt": "2026-09-19T18:15:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed on roomName"
+          },
+          "401": {
+            "description": "Authentication required"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create a new live room",
+        "tags": [
+          "Rooms"
+        ]
+      },
+      "get": {
+        "operationId": "RoomsController_findActiveRooms",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "List of active rooms",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "example": {
+                      "_id": "66fa89c0f91a2b0012349999",
+                      "roomName": "Tech Talk & Architecture Sync",
+                      "hostId": {
+                        "_id": "66fa89c0f91a2b0012345678",
+                        "name": "Jane Doe",
+                        "email": "jane.doe@example.com",
+                        "profileImage": null
+                      },
+                      "status": "ACTIVE",
+                      "participantCount": 2,
+                      "createdAt": "2026-09-19T18:15:00.000Z",
+                      "updatedAt": "2026-09-19T18:15:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List all currently active rooms",
+        "tags": [
+          "Rooms"
+        ]
+      }
+    },
+    "/admin/api/v1/rooms/{id}": {
+      "get": {
+        "operationId": "RoomsController_findById",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "MongoDB ObjectId of the room",
+            "schema": {
+              "example": "66fa89c0f91a2b0012349999",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Room information and list of active participants"
+          },
+          "400": {
+            "description": "Invalid room ID format"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "404": {
+            "description": "Room not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get room details and active participant roster",
+        "tags": [
+          "Rooms"
+        ]
+      }
+    },
+    "/admin/api/v1/rooms/{id}/join": {
+      "post": {
+        "operationId": "RoomsController_joinRoom",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "MongoDB ObjectId of the room",
+            "schema": {
+              "example": "66fa89c0f91a2b0012349999",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully joined room",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "Successfully joined the room",
+                    "room": {
+                      "_id": "66fa89c0f91a2b0012349999",
+                      "roomName": "Tech Talk & Architecture Sync",
+                      "status": "ACTIVE",
+                      "participantCount": 2
+                    },
+                    "participant": {
+                      "_id": "66fa89c0f91a2b001234aaaa",
+                      "roomId": "66fa89c0f91a2b0012349999",
+                      "userId": "66fa89c0f91a2b001234bbbb",
+                      "joinedAt": "2026-09-19T18:20:00.000Z",
+                      "status": "ACTIVE"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Room ended or user already participating"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "404": {
+            "description": "Room not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Join an active room as a participant",
+        "tags": [
+          "Rooms"
+        ]
+      }
+    },
+    "/admin/api/v1/rooms/{id}/leave": {
+      "post": {
+        "operationId": "RoomsController_leaveRoom",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "MongoDB ObjectId of the room",
+            "schema": {
+              "example": "66fa89c0f91a2b0012349999",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully left room (or room ended if host left)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "Successfully left the room",
+                    "roomId": "66fa89c0f91a2b0012349999",
+                    "roomStatus": "ACTIVE",
+                    "participantCount": 1
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "User is not an active participant in this room"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "404": {
+            "description": "Room not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Leave a room (or end room if host leaves)",
+        "tags": [
+          "Rooms"
+        ]
+      }
+    },
+    "/admin/api/v1/livekit/token": {
+      "post": {
+        "description": "Validates room existence, active status, and user role before signing a LiveKit WebRTC access token. Participant identity is securely extracted from the authenticated JWT.",
+        "operationId": "LivekitController_generateToken",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenerateLivekitTokenDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Token successfully generated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": true,
+                    "data": {
+                      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                      "serverUrl": "wss://demo.livekit.cloud",
+                      "roomName": "Tech Interview Prep"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Room is inactive or payload is invalid"
+          },
+          "401": {
+            "description": "Missing or invalid Bearer authentication token"
+          },
+          "403": {
+            "description": "User is not authorized as host for this room"
+          },
+          "404": {
+            "description": "Room with the specified name or ID does not exist"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Generate LiveKit WebRTC access token",
+        "tags": [
+          "LiveKit"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "Clearlink Admin APIs",
+    "description": "APIs Documentation for Clearlink Admin App.",
+    "version": "1.0",
+    "contact": {}
+  },
+  "tags": [
+    {
+      "name": "Clearlink_App_Admin_APIs",
+      "description": "APIs for Admin."
+    }
+  ],
+  "servers": [],
+  "components": {
+    "securitySchemes": {
+      "basic": {
+        "type": "http",
+        "scheme": "basic",
+        "description": "Basic authentication for API documentation access",
+        "name": "Authorization",
+        "in": "header"
+      },
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http",
+        "description": "Bearer token for authentication",
+        "name": "Authorization",
+        "in": "header"
+      }
+    },
+    "schemas": {
+      "RegisterDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "User full name",
+            "example": "John Doe"
+          },
+          "email": {
+            "type": "string",
+            "description": "Unique email address",
+            "example": "john.doe@example.com"
+          },
+          "password": {
+            "type": "string",
+            "description": "Account password (minimum 6 characters)",
+            "example": "SecretPassword123!",
+            "minLength": 6
+          },
+          "profileImage": {
+            "type": "string",
+            "description": "Optional profile avatar URL",
+            "example": "https://example.com/avatar.jpg"
+          }
+        },
+        "required": [
+          "name",
+          "email",
+          "password"
+        ]
+      },
+      "LoginDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "Registered user email address",
+            "example": "john.doe@example.com"
+          },
+          "password": {
+            "type": "string",
+            "description": "User account password",
+            "example": "SecretPassword123!"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "CreateUserDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "User full name",
+            "example": "John Doe"
+          },
+          "email": {
+            "type": "string",
+            "description": "User email address (must be unique)",
+            "example": "john.doe@example.com"
+          },
+          "password": {
+            "type": "string",
+            "description": "User account password (minimum 6 characters)",
+            "example": "StrongPassword123!",
+            "minLength": 6
+          },
+          "profileImage": {
+            "type": "string",
+            "description": "Optional profile image URL",
+            "example": "https://example.com/avatar.jpg"
+          }
+        },
+        "required": [
+          "name",
+          "email",
+          "password"
+        ]
+      },
+      "CreateRoomDto": {
+        "type": "object",
+        "properties": {
+          "roomName": {
+            "type": "string",
+            "description": "Name or title of the room",
+            "example": "Tech Talk & Architecture Sync",
+            "minLength": 3
+          }
+        },
+        "required": [
+          "roomName"
+        ]
+      },
+      "GenerateLivekitTokenDto": {
+        "type": "object",
+        "properties": {
+          "roomName": {
+            "type": "string",
+            "example": "Tech Interview Prep",
+            "description": "The name or ID of the room to join"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "host",
+              "participant"
+            ],
+            "example": "host",
+            "description": "The requested role: \"host\" or \"participant\""
+          }
+        },
+        "required": [
+          "roomName",
+          "role"
+        ]
+      }
+    }
+  }
+}

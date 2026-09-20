@@ -1,0 +1,472 @@
+{
+  "info": {
+    "_postman_id": "c85d1e2a-7b3f-4e92-91d4-8d48083a21bb",
+    "name": "LVS Innovation - Live Chat & Video Backend",
+    "description": "Complete Postman collection for testing, verifying, and recording demonstrations of the NestJS Collaborative Real-Time Chat and LiveKit Video application.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3005/admin/api/v1",
+      "type": "string",
+      "description": "Base URL of the API. Default is http://localhost:3005/admin/api/v1 (or http://localhost:3000 if running without service prefix)."
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string",
+      "description": "Stateless JWT access token populated automatically by Login/Register test scripts."
+    },
+    {
+      "key": "roomId",
+      "value": "",
+      "type": "string",
+      "description": "Active MongoDB Room ID populated automatically by Create Room test script."
+    }
+  ],
+  "item": [
+    {
+      "name": "AUTH",
+      "item": [
+        {
+          "name": "Register",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test(\"Status code is 201 Created\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test(\"Response has success true and accessToken\", function () {",
+                  "    pm.expect(res.success).to.eql(true);",
+                  "    pm.expect(res.data).to.have.property('accessToken');",
+                  "});",
+                  "if (res.data && res.data.accessToken) {",
+                  "    pm.collectionVariables.set(\"token\", res.data.accessToken);",
+                  "    console.log(\"[Postman] JWT saved to collection variable 'token'\");",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Alice Developer\",\n  \"email\": \"alice@example.com\",\n  \"password\": \"Password123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            },
+            "description": "Registers a new user account with hashed password and returns a JWT access token."
+          },
+          "response": []
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Response has success true and accessToken\", function () {",
+                  "    pm.expect(res.success).to.eql(true);",
+                  "    pm.expect(res.data).to.have.property('accessToken');",
+                  "});",
+                  "if (res.data && res.data.accessToken) {",
+                  "    pm.collectionVariables.set(\"token\", res.data.accessToken);",
+                  "    console.log(\"[Postman] JWT saved to collection variable 'token'\");",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"alice@example.com\",\n  \"password\": \"Password123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "Authenticates user credentials and sets the JWT access token in the collection variable 'token'."
+          },
+          "response": []
+        }
+      ],
+      "description": "Authentication endpoints for user registration and login."
+    },
+    {
+      "name": "USERS",
+      "item": [
+        {
+          "name": "Get Current User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"User profile returned without password\", function () {",
+                  "    pm.expect(res.success).to.eql(true);",
+                  "    pm.expect(res.data).to.have.property('email');",
+                  "    pm.expect(res.data).to.not.have.property('password');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "me"]
+            },
+            "description": "Fetches the profile of the currently authenticated user using the Bearer token."
+          },
+          "response": []
+        }
+      ],
+      "description": "User profile management endpoints."
+    },
+    {
+      "name": "ROOMS",
+      "item": [
+        {
+          "name": "Create Room",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test(\"Status code is 201 Created\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test(\"Room created with status ACTIVE\", function () {",
+                  "    pm.expect(res.success).to.eql(true);",
+                  "    pm.expect(res.data.status).to.eql('ACTIVE');",
+                  "});",
+                  "if (res.data && (res.data.id || res.data._id)) {",
+                  "    const id = res.data.id || res.data._id;",
+                  "    pm.collectionVariables.set(\"roomId\", id);",
+                  "    console.log(\"[Postman] Room ID saved to collection variable 'roomId': \" + id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Sprint Planning & Retrospective\",\n  \"password\": \"room-secret-123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/rooms",
+              "host": ["{{baseUrl}}"],
+              "path": ["rooms"]
+            },
+            "description": "Creates a new collaborative room, assigns caller as host, and stores the generated roomId in collection variables."
+          },
+          "response": []
+        },
+        {
+          "name": "List Active Rooms",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Returns array of active rooms\", function () {",
+                  "    pm.expect(res.success).to.eql(true);",
+                  "    pm.expect(res.data).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/rooms",
+              "host": ["{{baseUrl}}"],
+              "path": ["rooms"]
+            },
+            "description": "Lists all rooms that currently have status ACTIVE."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Room",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Room metadata returned with participants\", function () {",
+                  "    pm.expect(res.success).to.eql(true);",
+                  "    pm.expect(res.data).to.have.property('name');",
+                  "    pm.expect(res.data).to.have.property('participants');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/rooms/{{roomId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["rooms", "{{roomId}}"]
+            },
+            "description": "Fetches metadata, participant count, and roster for the room specified in {{roomId}}."
+          },
+          "response": []
+        },
+        {
+          "name": "Join Room",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Join response is success\", function () {",
+                  "    pm.expect(res.success).to.eql(true);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"password\": \"room-secret-123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/rooms/{{roomId}}/join",
+              "host": ["{{baseUrl}}"],
+              "path": ["rooms", "{{roomId}}", "join"]
+            },
+            "description": "Joins the room specified by {{roomId}}. Password is required if the room is password-protected. Prevents duplicate active membership."
+          },
+          "response": []
+        },
+        {
+          "name": "Leave Room",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Leave response is success\", function () {",
+                  "    pm.expect(res.success).to.eql(true);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/rooms/{{roomId}}/leave",
+              "host": ["{{baseUrl}}"],
+              "path": ["rooms", "{{roomId}}", "leave"]
+            },
+            "description": "Leaves the room specified by {{roomId}}. If the host leaves, the room is marked as ENDED."
+          },
+          "response": []
+        }
+      ],
+      "description": "Room lifecycle, discovery, joining, and leaving endpoints."
+    },
+    {
+      "name": "LIVEKIT",
+      "item": [
+        {
+          "name": "Generate LiveKit Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Returns valid signed LiveKit token and wsUrl\", function () {",
+                  "    pm.expect(res.success).to.eql(true);",
+                  "    pm.expect(res.data).to.have.property('token');",
+                  "    pm.expect(res.data).to.have.property('wsUrl');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"roomId\": \"{{roomId}}\",\n  \"requestedRole\": \"host\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/livekit/token",
+              "host": ["{{baseUrl}}"],
+              "path": ["livekit", "token"]
+            },
+            "description": "Issues a signed LiveKit WebRTC access token. Rejects host role requests from non-hosts with 403 Forbidden."
+          },
+          "response": []
+        }
+      ],
+      "description": "LiveKit WebRTC token generation and media authorization endpoints."
+    }
+  ]
+}
+

@@ -1,0 +1,44 @@
+syntax = "proto3";
+package clearlink.admin;
+
+service AdminService {
+    rpc findById(Id) returns (userData) {}
+    rpc isEmailExist(Email) returns (userData) {}
+    rpc createActivityLog(ActivityLogRequest) returns (ActivityLogResponse) {}
+}
+
+message Id {
+    string id = 1;
+}
+
+message Email {
+    string email = 1;
+}
+
+message userData {
+    string id = 1;
+    string userType = 2;
+    string email = 3;
+    string fullName = 4;
+    string status = 5;
+    string password = 6;
+    string salt = 7;
+}
+
+message ActivityLogRequest {
+    string adminId = 1;
+    string adminName = 2;
+    string role = 3;
+    string email = 4;
+    string endpoint = 5;
+    string method = 6;
+    string module = 7;
+    string actionTaken = 8;
+    string actionDescription = 9;
+    string ip = 10;
+}
+
+message ActivityLogResponse {
+    bool success = 1;
+    string message = 2;
+}
